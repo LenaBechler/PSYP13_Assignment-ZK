@@ -327,8 +327,10 @@ stem(data_sample_3$mindfulness) #remove 6 cases mindfulness<1
 data_sample_4=data_sample_3 #copy of data set
 data_sample_4=data_sample_4[!data_sample_4$mindfulness<1,] #remove all cased mindfulness<1
 summary(data_sample_4)
+describe(data_sample_4)
 
 #Histograms: look at distribution
+par(mfrow=c(2,4))
 hist(data_sample_4$pain, breaks = 30)
 hist(data_sample_4$age, breaks = 30)
 hist(data_sample_4$STAI_trait, breaks = 30)
@@ -337,8 +339,10 @@ hist(data_sample_4$cortisol_serum, breaks = 30)
 hist(data_sample_4$cortisol_saliva, breaks = 30)
 hist(data_sample_4$mindfulness, breaks = 30)
 hist(data_sample_4$weight, breaks = 30)
+par(mfrow=c(1,1))
 
 #Boxplots
+par(mfrow=c(2,4))
 boxplot(data_sample_4$pain, main="Boxplot data_sample_4$pain")
 boxplot(data_sample_4$age, main="Boxplot data_sample_4$age")
 boxplot(data_sample_4$STAI_trait, main="Boxplot data_sample_4$STAI_trait") #Outlier 1 min (ID 155), 1 max (ID 46)
@@ -347,15 +351,18 @@ boxplot(data_sample_4$cortisol_serum, main="Boxplot data_sample_4$cortisol_serum
 boxplot(data_sample_4$cortisol_saliva, main="Boxplot data_sample_4$cortisol_saliva") #Outlier 3 min (ID 33, ID 118, ID 91)
 boxplot(data_sample_4$mindfulness, main="Boxplot data_sample_4$mindfulness")
 boxplot(data_sample_4$weight, main="Boxplot data_sample_4$weight") #Outlier 2 min (ID 15, ID 5 )
+par(mfrow=c(1,1))
 
 #APPLICATION OLD MODELS ON NEW DATA SET
 #predict values of new data set based on models
 pred.theory.based.model <- predict( object = theory.based.model, newdata = data_sample_4)
 plot( x = pred.theory.based.model, y = data_sample_4$pain, 
+      main= "Theory.based.model on data_sample_4",
       xlab = "Fitted Values", ylab = "Observed Values")
 
 pred.backward.model <- predict( object = backward.model, newdata = data_sample_4)
 plot( x = pred.backward.model, y = data_sample_4$pain, 
+      main= "backward.model on data_sample_4",
       xlab = "Fitted Values", ylab = "Observed Values")
 
 #residuals: amount of error produced by application of models on new data
@@ -377,86 +384,86 @@ library(reshape2)
 library(r2glmm)
 library(cAIC4)
 
-data_sample_4=read.csv("https://raw.githubusercontent.com/kekecsz/PSYP13_Data_analysis_class/master/home_sample_3.csv")
+data_sample_5=read.csv("https://raw.githubusercontent.com/kekecsz/PSYP13_Data_analysis_class/master/home_sample_3.csv")
 
 # asign ID as factors
-data_sample_4$ID = factor(data_sample_4$ID)
+data_sample_5$ID = factor(data_sample_5$ID)
 
 #----EXPLORATION OF DATA
 #check for missing data & outliers
-who(data_sample_4)
-summary(data_sample_4)
-describe(data_sample_4)
+who(data_sample_5)
+summary(data_sample_5)
+describe(data_sample_5)
 
 #check for outliers
 par(mfrow=c(2,4))
-boxplot(data_sample_4$age, main="Boxplot data_sample_4$age")
-boxplot(data_sample_4$weight, main="Boxplot data_sample_4$weight")
-boxplot(data_sample_4$STAI_trait, main="Boxplot data_sample_4$STAI_trait") #Outliers 1 min (ID 10) $ 1 max (ID 13)
-boxplot(data_sample_4$pain_cat, main="Boxplot data_sample_4$pain_cat") #Outlier 1 max (ID 11)
-boxplot(data_sample_4$cortisol_serum,"Boxplot data_sample_4$cortisol_serum") #1Outlier
-boxplot(data_sample_4$mindfulness, main="Boxplot data_sample_4$mindfulness")
-boxplot(data_sample_4$pain_rating, main="Boxplot data_sample_4$pain_rating") #Outlier: 1 max (ID 11)
+boxplot(data_sample_5$age, main="Boxplot data_sample_5$age")
+boxplot(data_sample_5$weight, main="Boxplot data_sample_5$weight")
+boxplot(data_sample_5$STAI_trait, main="Boxplot data_sample_5$STAI_trait") #Outliers 1 min (ID 10) $ 1 max (ID 13)
+boxplot(data_sample_5$pain_cat, main="Boxplot data_sample_5$pain_cat") #Outlier 1 max (ID 11)
+boxplot(data_sample_5$cortisol_serum,"Boxplot data_sample_5$cortisol_serum") #1Outlier
+boxplot(data_sample_5$mindfulness, main="Boxplot data_sample_5$mindfulness")
+boxplot(data_sample_5$pain_rating, main="Boxplot data_sample_5$pain_rating") #Outlier: 1 max (ID 11)
 par(mfrow=c(1,1))
 
 # histograms
 par(mfrow=c(2,2))
-hist(data_sample_4$pain1)
-hist(data_sample_4$pain2)
-hist(data_sample_4$pain3)
-hist(data_sample_4$pain4)
+hist(data_sample_5$pain1)
+hist(data_sample_5$pain2)
+hist(data_sample_5$pain3)
+hist(data_sample_5$pain4)
 par(mfrow=c(1,1))
 
 #designate which are the repeated varibales & correlation
 repeated_variables = c("pain1",	"pain2", "pain3",	"pain4")
-cor(data_sample_4[,repeated_variables]) #correlation between close times higher.
+cor(data_sample_5[,repeated_variables]) #correlation between close times higher.
 
 #----TRANSFORMATION FORMAT WIDE TO LONG
 # id.vars should be all non-repeated variables
-data_sample_4_long = melt(data_sample_4, measure.vars=repeated_variables, variable.name = "time", value.name = "pain_rating")
+data_sample_5_long = melt(data_sample_5, measure.vars=repeated_variables, variable.name = "time", value.name = "pain_rating")
 # order data frame by participant ID(not necessary, just makes the dataframe look more intuitive)
-data_sample_4_long = data_sample_4_long[order(data_sample_4_long[,"ID"]),]
+data_sample_5_long = data_sample_5_long[order(data_sample_5_long[,"ID"]),]
 # change the time variable to a numerical vector
-data_sample_4_long$time = as.numeric(data_sample_4_long$time)
+data_sample_5_long$time = as.numeric(data_sample_5_long$time)
 
 #check data again
-data_sample_4_long
-summary(data_sample_4_long)
+data_sample_5_long
+summary(data_sample_5_long)
 
 
 
 #---REGRESSION MODELS
 #fixed model (1)
-mod_fix=lm(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time, data=data_sample_4_long)
+mod_fix=lm(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time, data=data_sample_5_long)
 summary(mod_fix)
 
 #model with random intercept for participant ID (2)
-mod_random_int = lmer(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time +  (1|ID), data = data_sample_4_long)
+mod_random_int = lmer(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time +  (1|ID), data = data_sample_5_long)
 summary(mod_random_int)
 
 #model with random intercepts and slopes (3)
-mod_random_both = lmer(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time + (time|ID), data = data_sample_4_long)
+mod_random_both = lmer(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time + (time|ID), data = data_sample_5_long)
 summary(mod_random_both)
 
 
 #----PLOTS MODEL 1, 2, 3 
 # plot with regression line individually for each particpant (1)
-data_sample_4_long$pred_mod_fix = predict(mod_fix)
-ggplot(data_sample_4_long, aes(y = pain_rating, x = time, group = ID))+
+data_sample_5_long$pred_mod_fix = predict(mod_fix)
+ggplot(data_sample_5_long, aes(y = pain_rating, x = time, group = ID))+
   geom_point(size = 2) +
   geom_line(color='red', aes(y=pain_rating, x=time))+
   facet_wrap( ~ ID, ncol = 5)
 
 # random intercept model (2)
-data_sample_4_long$pred_random_int = predict(mod_random_int)
-ggplot(data_sample_4_long, aes(y = pain_rating, x = time, group = ID))+
+data_sample_5_long$pred_random_int = predict(mod_random_int)
+ggplot(data_sample_5_long, aes(y = pain_rating, x = time, group = ID))+
   geom_point(size = 2)+
   geom_line(color='red', aes(y=pred_random_int, x=time))+
   facet_wrap( ~ ID, ncol = 5)
 
 # random slope and intercept model (3)
-data_sample_4_long$pred_random_both = predict(mod_random_both)
-ggplot(data_sample_4_long, aes(y = pain_rating, x = time, group = ID))+
+data_sample_5_long$pred_random_both = predict(mod_random_both)
+ggplot(data_sample_5_long, aes(y = pain_rating, x = time, group = ID))+
   geom_point(size = 2)+
   geom_line(color='red', aes(y=pred_random_both, x=time))+
   facet_wrap( ~ ID, ncol = 5)
@@ -482,7 +489,7 @@ anova(mod_random_int, mod_random_both)
 
 #----REGRESSION QUADRATIC MODEL (4)----
 #model and summary
-mod_random_int_quad = lmer(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time + I(time^2) + (1+time|ID), data = data_sample_4_long)
+mod_random_int_quad = lmer(pain_rating ~ sex + age + weight + STAI_trait + pain_cat + cortisol_serum + mindfulness + time + I(time^2) + (1+time|ID), data = data_sample_5_long)
 summary(mod_random_int_quad)
 r2beta(mod_random_int_quad, method="nsj")
 cAIC(mod_random_int_quad)
@@ -502,7 +509,7 @@ stdCoef.merMod(mod_random_int_quad)
 confint(mod_random_int_quad) #no overlap with 0 --> so ok
 
 #Plot
-data_sample_4_long$pred_random_int_quad = predict(mod_random_int_quad) 
+data_sample_5_long$pred_random_int_quad = predict(mod_random_int_quad) 
 ggplot(data_sample_5_long, aes(y = pain_rating, x = time, group = ID))+
   geom_point(size = 3)+
   geom_line(color='red', aes(y=pred_random_int_quad, x=time))+
@@ -545,7 +552,7 @@ plot(mod_random_int_quad)
 par(mfrow=c(2,4))
 predictors=c("age")
 for(i in 1:length(predictors)){
-  predictor_to_test = data_sample_4_long[,predictors[i]]
+  predictor_to_test = data_sample_5_long[,predictors[i]]
   print(
     ggplot(data.frame(x = predictor_to_test,pearson=residuals(mod_random_int_quad,type="pearson")),
            aes(x=x,y=pearson)) +
@@ -565,7 +572,7 @@ for(i in 1:length(predictors)){
 
 predictors=c("STAI_trait")
 for(i in 1:length(predictors)){
-  predictor_to_test = data_sample_4_long[,predictors[i]]
+  predictor_to_test = data_sample_5_long[,predictors[i]]
   print(
     ggplot(data.frame(x = predictor_to_test,pearson=residuals(mod_random_int_quad,type="pearson")),
            aes(x=x,y=pearson)) +
@@ -575,7 +582,7 @@ for(i in 1:length(predictors)){
 
 predictors=c("pain_cat")
 for(i in 1:length(predictors)){
-  predictor_to_test = data_sample_4_long[,predictors[i]]
+  predictor_to_test = data_sample_5_long[,predictors[i]]
   print(
     ggplot(data.frame(x = predictor_to_test,pearson=residuals(mod_random_int_quad,type="pearson")),
            aes(x=x,y=pearson)) +
@@ -585,7 +592,7 @@ for(i in 1:length(predictors)){
 
 predictors=c("cortisol_serum")
 for(i in 1:length(predictors)){
-  predictor_to_test = data_sample_4_long[,predictors[i]]
+  predictor_to_test = data_sample_5_long[,predictors[i]]
   print(
     ggplot(data.frame(x = predictor_to_test,pearson=residuals(mod_random_int_quad,type="pearson")),
            aes(x=x,y=pearson)) +
@@ -595,7 +602,7 @@ for(i in 1:length(predictors)){
 
 predictors=c("mindfulness")
 for(i in 1:length(predictors)){
-  predictor_to_test = data_sample_4_long[,predictors[i]]
+  predictor_to_test = data_sample_5_long[,predictors[i]]
   print(
     ggplot(data.frame(x = predictor_to_test,pearson=residuals(mod_random_int_quad,type="pearson")),
            aes(x=x,y=pearson)) +
@@ -605,7 +612,7 @@ for(i in 1:length(predictors)){
 
 predictors=c("weight")
 for(i in 1:length(predictors)){
-  predictor_to_test = data_sample_4_long[,predictors[i]]
+  predictor_to_test = data_sample_5_long[,predictors[i]]
   print(
     ggplot(data.frame(x = predictor_to_test,pearson=residuals(mod_random_int_quad,type="pearson")),
            aes(x=x,y=pearson)) +
@@ -620,12 +627,12 @@ plot(mod_random_int_quad) #funnel shape ?
 
   # Levens model for testing the for heteroscedasticity, from here: http://ademos.people.uic.edu/Chapter18.html
   # look at the overall model F and p, if it is significant, there may be heteroscedasticity
-summary(lm(residuals(mod_random_int_quad)^2 ~ data_sample_4_long[,"ID"]))
+summary(lm(residuals(mod_random_int_quad)^2 ~ data_sample_5_long[,"ID"]))
 
 # Multicollinearity
 # there are some functions out there, but for now just look at the correlation matrix
 # some example of a function designed to extract vif from lmer: https://raw.githubusercontent.com/aufrank/R-hacks/master/mer-utils.R
-pairs.panels(data_sample_4_long, col = "red", lm = T)
+pairs.panels(data_sample_5_long, col = "red", lm = T)
 
 #VIF
 vif.mer <- function (fit) {
@@ -746,4 +753,4 @@ maxcorr.mer <- function (fit,
 
 vif.mer(mod_random_int_quad)
 
-cor(data_sample_4_long[,c("pain_rating", "age", "weight", "STAI_trait", "pain_cat", "mindfulness", "cortisol_serum", "time")])
+cor(data_sample_5_long[,c("pain_rating", "age", "weight", "STAI_trait", "pain_cat", "mindfulness", "cortisol_serum", "time")])
